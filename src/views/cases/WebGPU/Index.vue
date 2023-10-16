@@ -1,5 +1,22 @@
 <template>
-  <canvas ref="canvas" width="512" height="512" style="height: 100%"></canvas>
+  <Suspense>
+    <template v-slot:default>
+      <canvas
+        ref="canvas"
+        width="512"
+        height="512"
+        style="height: 100%"
+      ></canvas>
+    </template>
+    <template v-slot:fallback>
+      <canvas
+        ref="canvas"
+        width="512"
+        height="512"
+        style="height: 100%"
+      ></canvas>
+    </template>
+  </Suspense>
 </template>
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
