@@ -17,7 +17,7 @@ import { onMounted, onUnmounted, ref } from "vue";
 import * as THREE from "three";
 import * as dat from "lil-gui";
 import gsap from "gsap";
-import { releaseRender } from "@/util/threeUtil";
+import { releaseRenderer } from "@/util/releaseRender";
 let renderer;
 let scene;
 onMounted(() => {
@@ -232,7 +232,7 @@ onMounted(() => {
 
   onUnmounted(() => {
     gui.destroy();
-    releaseRender(renderer, scene);
+    releaseRenderer(renderer, scene);
   });
 });
 </script>

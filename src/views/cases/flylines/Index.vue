@@ -9,7 +9,7 @@ import TWEEN from "@tweenjs/tween.js";
 import flyLineVertexShader from "./shaders/flyline/vertex.glsl?raw";
 import flyLineFragmentShader from "./shaders/flyline/fragment.glsl?raw";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { releaseRender } from "@/util/threeUtil";
+import { releaseRenderer } from "@/util/releaseRenderer";
 
 const sizes = {
   width: window.innerWidth,
@@ -154,6 +154,6 @@ onMounted(() => {
   render();
 });
 onUnmounted(() => {
-  releaseRender(renderer, scene);
+  releaseRenderer(renderer, scene);
 });
 </script>

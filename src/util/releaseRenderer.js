@@ -1,5 +1,5 @@
 import * as THREE from "three";
-export function releaseRender(renderer, scene) {
+export function releaseRenderer(renderer, scene) {
   let clearScene = function (scene) {
     let arr = scene.children.filter((x) => x);
     arr.forEach((item) => {

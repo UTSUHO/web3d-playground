@@ -8,7 +8,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as dat from "lil-gui";
 import waterVertexShader from "./shaders/vertex.glsl";
 import waterFragmentShader from "./shaders/fragment.glsl";
-import { releaseRender } from "@/util/threeUtil";
+import { releaseRenderer } from "@/util/releaseRenderer";
 const gui = new dat.GUI({ width: 340 });
 let renderer;
 let scene;
@@ -197,6 +197,6 @@ onMounted(() => {
 });
 onUnmounted(() => {
   gui.destroy();
-  releaseRender(renderer, scene);
+  releaseRenderer(renderer, scene);
 });
 </script>

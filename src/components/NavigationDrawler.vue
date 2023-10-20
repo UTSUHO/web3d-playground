@@ -32,12 +32,6 @@
         to="/home"
       ></v-list-item>
       <v-list-item
-        prepend-icon="mdi-progress-wrench"
-        title="On Building Project"
-        value="WebGPU"
-        to="/WebGPU"
-      ></v-list-item>
-      <v-list-item
         prepend-icon="mdi-animation"
         title="Lottie-Web Animation"
         value="lottie"
@@ -72,6 +66,12 @@
         title="Shader Practice"
         value="shader-practice"
         to="/shader-practice"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-controller"
+        title="WebGPU Conway's Game of Life"
+        value="WebGPU"
+        to="/WebGPU"
       ></v-list-item>
     </v-list>
   </v-navigation-drawer>

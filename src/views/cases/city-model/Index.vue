@@ -11,7 +11,7 @@ import * as dat from "lil-gui";
 import testVertexShader from "./shaders/test/vertex.glsl";
 import testFragmentShader from "./shaders/test/fragment.glsl";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { releaseRender } from "@/util/threeUtil";
+import { releaseRenderer } from "@/util/releaseRenderer";
 let scene;
 let renderer;
 const loader = new GLTFLoader();
@@ -198,6 +198,6 @@ onMounted(() => {
 // }
 onUnmounted(() => {
   //   gui.destroy();
-  releaseRender(renderer, scene);
+  releaseRenderer(renderer, scene);
 });
 </script>
