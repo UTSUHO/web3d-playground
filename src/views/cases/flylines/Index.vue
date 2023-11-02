@@ -9,7 +9,7 @@ import TWEEN from "@tweenjs/tween.js";
 import flyLineVertexShader from "./shaders/flyline/vertex.glsl?raw";
 import flyLineFragmentShader from "./shaders/flyline/fragment.glsl?raw";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { releaseRenderer } from "@/util/releaseRenderer";
+import { releaseRenderer } from "@/util/three/releaseRenderer";
 
 const sizes = {
   width: window.innerWidth,

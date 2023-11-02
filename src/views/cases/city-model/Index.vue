@@ -11,7 +11,7 @@ import * as dat from "lil-gui";
 import testVertexShader from "./shaders/test/vertex.glsl";
 import testFragmentShader from "./shaders/test/fragment.glsl";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { releaseRenderer } from "@/util/releaseRenderer";
+import { releaseRenderer } from "@/util/three/releaseRenderer";
 let scene;
 let renderer;
 const loader = new GLTFLoader();

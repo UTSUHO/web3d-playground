@@ -17,7 +17,7 @@ import { onMounted, onUnmounted, ref } from "vue";
 import * as THREE from "three";
 import * as dat from "lil-gui";
 import gsap from "gsap";
-import { releaseRenderer } from "@/util/releaseRender";
+import { releaseRenderer } from "@/util/three/releaseRenderer";
 let renderer;
 let scene;
 onMounted(() => {
