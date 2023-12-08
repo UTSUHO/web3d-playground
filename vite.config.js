@@ -3,6 +3,7 @@ import vue from "@vitejs/plugin-vue";
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 import ViteFonts from "unplugin-fonts/vite";
 import glsl from "vite-plugin-glsl";
+import svgLoader from "vite-svg-loader";
 
 // Utilities
 import { defineConfig } from "vite";
@@ -32,6 +33,7 @@ export default defineConfig({
       },
     }),
     glsl(),
+    svgLoader(),
   ],
   define: { "process.env": {} },
   resolve: {

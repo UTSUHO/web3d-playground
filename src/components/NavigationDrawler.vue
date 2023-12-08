@@ -32,6 +32,18 @@
         to="/home"
       ></v-list-item>
       <v-list-item
+        prepend-icon="mdi-orbit"
+        title="Galaxy Generator"
+        value="galaxy-generator"
+        to="/galaxy-generator"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-stove"
+        title="Bake Experiment"
+        value="bake-experiment"
+        to="/bake-experiment"
+      ></v-list-item>
+      <v-list-item
         prepend-icon="mdi-animation"
         title="Lottie-Web Animation"
         value="lottie"

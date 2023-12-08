@@ -14,16 +14,17 @@ const routes = [
         // which is lazy-loaded when the route is visited.
         redirect: "/home",
         children: [
-          {
-            path: "wave",
-            name: "wave",
-            component: () => import("@/views/cases/wave/Wave.vue"),
-          },
+          
           {
             path: "home",
             name: "home",
             component: () =>
               import("@/views/Home.vue"),
+          },
+          {
+            path: "wave",
+            name: "wave",
+            component: () => import("@/views/cases/wave/Wave.vue"),
           },
           {
             path: "scroll",
@@ -60,6 +61,18 @@ const routes = [
             name: "shader-practice",
             component: () =>
               import("@/views/cases/shader-practice/Index.vue"),
+          },
+          {
+            path: "bake-experiment",
+            name: "bake-experiment",
+            component: () =>
+              import("@/views/cases/bake-experiment/Index.vue"),
+          },
+          {
+            path: "galaxy-generator",
+            name: "galaxy-generator",
+            component: () =>
+              import("@/views/cases/galaxy-generator/Index.vue"),
           },
         ],
       },

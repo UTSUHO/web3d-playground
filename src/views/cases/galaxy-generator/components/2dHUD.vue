@@ -1,19 +1,33 @@
 <template>
-  <!-- <science /> -->
-  <HUD ref="hud" :svg-type="0" style="margin:auto"/>
+  <div v-show="!isHidden" ref="hudRef" style="color: white">
+    <div class="">Access</div>
+    <div>Cloud Server</div>
+    <div class="HUD-image">
+      <science v-if="svgType == 0" />
+      <compute v-else-if="svgType == 1" />
+      <brain v-else-if="svgType == 2" />
+    </div>
+  </div>
 </template>
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, defineProps } from "vue";
 import science from "@/assets/svg/galaxy/science.svg";
-import HUD from "@/views/cases/galaxy-generator/components/2dHUD.vue";
+import compute from "@/assets/svg/galaxy/compute.svg";
+import brain from "@/assets/svg/galaxy/brain.svg";
+const hudRef = ref(null);
 
-const hud = ref(null);
-
-onMounted(() => {
-  console.log({ ...hud.value }.hudRef);
+const props = defineProps({
+  svgType: Number,
+  isHidden: { type: Boolean, default: false },
 });
+// console.log(defineExpose)
+defineExpose({ hudRef });
 </script>
 <style lang="scss" scoped>
+.HUD-image {
+  height: 80px;
+  width: 80px;
+}
 .icon__round {
   transform-origin: center;
   :deep(circle) {

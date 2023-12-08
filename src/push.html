@@ -1,0 +1,121 @@
+<html>
+  <body></body>
+</html>
+<style>
+  body {
+    overflow: hidden;
+    margin: 0;
+  }
+</style>
+<script type="module">
+  import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
+  import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
+  import * as BufferGeometryUtils from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/utils/BufferGeometryUtils.js";
+  let mouseMesh;
+  let pos = new THREE.Vector3(0, 0, 0);
+  let mouse = { x: 0, y: 0 };
+
+  let scene = new THREE.Scene();
+  let camera = new THREE.PerspectiveCamera(
+    60,
+    innerWidth / innerHeight,
+    1,
+    100
+  );
+  camera.position.set(10, 10, 10);
+  let renderer = new THREE.WebGLRenderer();
+  renderer.setSize(innerWidth, innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  let controls = new OrbitControls(camera, renderer.domElement);
+  let ballGeometry = new THREE.SphereGeometry(0.5, 16, 8);
+  let marker = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 8),
+    new THREE.MeshBasicMaterial({ color: "red", wireframe: true })
+  );
+  scene.add(marker);
+  const axesHelper = new THREE.AxesHelper(10);
+  scene.add(axesHelper);
+  let g = new THREE.IcosahedronGeometry(4, 20);
+  g = BufferGeometryUtils.mergeVertices(g);
+  console.log(g);
+  let uniforms = {
+    mousePos: { value: new THREE.Vector3() },
+    sateLitePos: { value: new THREE.Vector3() },
+  };
+  let m = new THREE.PointsMaterial({
+    size: 0.1,
+    onBeforeCompile: (shader) => {
+      shader.uniforms.mousePos = uniforms.mousePos;
+      console.log(shader.vertexShader);
+      shader.vertexShader = `
+      uniform vec3 mousePos;
+      uniform vec3 sateLitePos;
+      ${shader.vertexShader}
+    `.replace(
+        `#include <begin_vertex>`,
+        `#include <begin_vertex>
+        
+        vec3 mouseSeg = position - mousePos;
+        vec3 sateLiteSeg = position - sateLitePos;
+
+        transformed = forceField(mouseSeg,transformed);
+        transformed = forceField(sateLiteSeg,transformed);
+
+      `
+      );
+      shader.vertexShader = `${shader.vertexShader}`.replace(
+        `void main() {`,
+        `vec3 forceField(vec3 segment,vec3 transformedObj){
+            vec3 dir = normalize(segment);
+        float dist = length(segment);
+        float force = clamp(1. / (dist * dist), 0., 1.);
+        if (dist < 2.){
+          transformedObj += dir * force;
+        }
+        return transformedObj;
+        }
+        void main() {`
+      );
+
+      console.log(shader.fragmentShader);
+    },
+  });
+  let p = new THREE.Points(g, m);
+  scene.add(p);
+  var mouseMaterial = new THREE.MeshBasicMaterial({
+    color: 0x0000ff,
+    wireframe: true,
+  });
+  mouseMesh = new THREE.Mesh(ballGeometry, mouseMaterial);
+  mouseMesh.position.z = -5;
+  scene.add(mouseMesh);
+
+  let clock = new THREE.Clock();
+  function onMouseMove(event) {
+    event.preventDefault();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Make the sphere follow the mouse
+    var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+    vector.unproject(camera);
+    var dir = vector.sub(camera.position).normalize();
+    var distance = -camera.position.z / dir.z;
+    pos = camera.position.clone().add(dir.multiplyScalar(distance));
+    mouseMesh.position.copy(pos);
+    // Make the sphere follow the mouse
+    //	mouseMesh.position.set(event.clientX, event.clientY, 0);
+  }
+  document.addEventListener("mousemove", onMouseMove, false);
+  renderer.setAnimationLoop((_) => {
+    let t = clock.getElapsedTime();
+    marker.position.x = Math.sin(t * 0.5) * 5;
+    marker.position.y = Math.cos(t * 0.3) * 5;
+    // marker.position.z = Math.sin(t * 0.5) * 5;
+    uniforms.mousePos.value.copy(pos);
+    uniforms.sateLitePos.value.copy(marker.position);
+    // console.log(uniforms.sateLitePos.value)
+    renderer.render(scene, camera);
+  });
+</script>

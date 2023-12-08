@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   class="icon icon__round icon__size-normal"
+   viewBox="-20 -20 40 40"
+   aria-hidden="true"
+   version="1.1"
+   id="svg22"
+   sodipodi:docname="compute.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs26" />
+  <sodipodi:namedview
+     id="namedview24"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="7.3981047"
+     inkscape:cx="-1.8923766"
+     inkscape:cy="47.174244"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg22" />
+  <circle
+     class="icon__default-circle"
+     cx="0"
+     cy="0"
+     r="19.5"
+     vector-effect="non-scaling-stroke"
+     style="visibility:inherit;opacity:1"
+     id="circle2" />
+  <circle
+     class="icon__second-circle"
+     cx="0"
+     cy="0"
+     r="19.5"
+     vector-effect="non-scaling-stroke"
+     id="circle4" />
+  <circle
+     class="icon__third-circle"
+     cx="0"
+     cy="0"
+     r="19.5"
+     vector-effect="non-scaling-stroke"
+     id="circle6" />
+  <circle
+     class="icon__background-circle"
+     cx="0"
+     cy="0"
+     r="19.5"
+     vector-effect="non-scaling-stroke"
+     id="circle8" />
+  <g
+     class="icon__content"
+     data-svg-origin="20 20.09999942779541"
+     style="visibility:inherit;opacity:1"
+     transform="translate(-20,-20)"
+     id="g12">
+    <path
+       d="m 29.5,18.1 v -3.8 h -3.8 v 1.2 l -3.8,-3.2 v -1.7 h -3.8 v 1.7 l -3.8,3.2 v -1.1 h -3.8 v 3.8 H 12 V 22 h -1.5 v 3.8 h 3.8 v -1 l 3.8,3.2 v 1.6 h 3.8 V 28 l 3.8,-3.2 v 1 h 3.8 V 22 h -1.4 v -3.8 h 1.4 z m -3,-3 h 2.2 v 2.2 h -2.2 z m -1.1,1.1 -3.5,2.9 V 18 h -1.5 v -3.8 h 1.5 v -1 z m -6.5,4.9 v -2.2 h 2.2 v 2.2 z m 0,-9.8 h 2.2 v 2.2 h -2.2 z m 0.7,3 v 3.8 h -1.5 v 1.1 l -3.6,-3 3.6,-3 v 1.1 z m -8.3,0.8 h 2.2 v 2.2 h -2.2 z m 1.5,3 h 1.5 v -1 l 3.5,2.9 -3.5,2.9 v -1 h -1.5 z m 0.7,6.8 h -2.2 v -2.2 h 2.2 z m 1,-1.1 3.6,-3.1 v 1.1 h 1.5 v 3.8 h -1.5 v 1.2 z m 6.6,4.9 h -2.2 v -2.2 h 2.2 z m -0.7,-3 v -3.8 h 1.5 v -1.1 l 3.6,3 -3.6,3 v -1.2 h -1.5 z m 8.3,-0.8 h -2.2 v -2.2 h 2.2 z m -1.4,-3 H 25.7 V 23 l -3.5,-3 3.5,-3 v 1.1 h 1.6 z"
+       id="path10" />
+  </g>
+  <g
+     class="icon__content icon__content-shine"
+     data-svg-origin="20 20.09999942779541"
+     style="visibility:inherit;opacity:1"
+     transform="translate(-20,-20)"
+     id="g16">
+    <path
+       d="m 29.5,18.1 v -3.8 h -3.8 v 1.2 l -3.8,-3.2 v -1.7 h -3.8 v 1.7 l -3.8,3.2 v -1.1 h -3.8 v 3.8 H 12 V 22 h -1.5 v 3.8 h 3.8 v -1 l 3.8,3.2 v 1.6 h 3.8 V 28 l 3.8,-3.2 v 1 h 3.8 V 22 h -1.4 v -3.8 h 1.4 z m -3,-3 h 2.2 v 2.2 h -2.2 z m -1.1,1.1 -3.5,2.9 V 18 h -1.5 v -3.8 h 1.5 v -1 z m -6.5,4.9 v -2.2 h 2.2 v 2.2 z m 0,-9.8 h 2.2 v 2.2 h -2.2 z m 0.7,3 v 3.8 h -1.5 v 1.1 l -3.6,-3 3.6,-3 v 1.1 z m -8.3,0.8 h 2.2 v 2.2 h -2.2 z m 1.5,3 h 1.5 v -1 l 3.5,2.9 -3.5,2.9 v -1 h -1.5 z m 0.7,6.8 h -2.2 v -2.2 h 2.2 z m 1,-1.1 3.6,-3.1 v 1.1 h 1.5 v 3.8 h -1.5 v 1.2 z m 6.6,4.9 h -2.2 v -2.2 h 2.2 z m -0.7,-3 v -3.8 h 1.5 v -1.1 l 3.6,3 -3.6,3 v -1.2 h -1.5 z m 8.3,-0.8 h -2.2 v -2.2 h 2.2 z m -1.4,-3 H 25.7 V 23 l -3.5,-3 3.5,-3 v 1.1 h 1.6 z"
+       id="path14" />
+  </g>
+  <g
+     class="icon__content icon__content-shine-permanent"
+     data-svg-origin="20 20.09999942779541"
+     style="visibility:inherit;opacity:1"
+     transform="translate(-20,-20)"
+     id="g20">
+    <path
+       d="m 29.5,18.1 v -3.8 h -3.8 v 1.2 l -3.8,-3.2 v -1.7 h -3.8 v 1.7 l -3.8,3.2 v -1.1 h -3.8 v 3.8 H 12 V 22 h -1.5 v 3.8 h 3.8 v -1 l 3.8,3.2 v 1.6 h 3.8 V 28 l 3.8,-3.2 v 1 h 3.8 V 22 h -1.4 v -3.8 h 1.4 z m -3,-3 h 2.2 v 2.2 h -2.2 z m -1.1,1.1 -3.5,2.9 V 18 h -1.5 v -3.8 h 1.5 v -1 z m -6.5,4.9 v -2.2 h 2.2 v 2.2 z m 0,-9.8 h 2.2 v 2.2 h -2.2 z m 0.7,3 v 3.8 h -1.5 v 1.1 l -3.6,-3 3.6,-3 v 1.1 z m -8.3,0.8 h 2.2 v 2.2 h -2.2 z m 1.5,3 h 1.5 v -1 l 3.5,2.9 -3.5,2.9 v -1 h -1.5 z m 0.7,6.8 h -2.2 v -2.2 h 2.2 z m 1,-1.1 3.6,-3.1 v 1.1 h 1.5 v 3.8 h -1.5 v 1.2 z m 6.6,4.9 h -2.2 v -2.2 h 2.2 z m -0.7,-3 v -3.8 h 1.5 v -1.1 l 3.6,3 -3.6,3 v -1.2 h -1.5 z m 8.3,-0.8 h -2.2 v -2.2 h 2.2 z m -1.4,-3 H 25.7 V 23 l -3.5,-3 3.5,-3 v 1.1 h 1.6 z"
+       id="path18" />
+  </g>
+</svg>
