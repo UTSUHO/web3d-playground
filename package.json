@@ -1,6 +1,6 @@
 {
   "name": "web3d-playground",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,6 +12,7 @@
   "dependencies": {
     "@mdi/font": "7.0.96",
     "@tweenjs/tween.js": "^21.0.0",
+    "camera-controls": "^2.7.3",
     "core-js": "^3.29.0",
     "gsap": "^3.12.2",
     "lil-gui": "^0.18.2",

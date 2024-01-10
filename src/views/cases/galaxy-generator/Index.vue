@@ -8,9 +8,11 @@
     :svg-type="1"
   />
   <hud ref="HPC" class="HUD-isHudHidden" :svg-type="2" />
-  <v-btn style="position: absolute; top: 0px; left: 47%" @click="reset"
-    >reset</v-btn
-  >
+  <div class="HUD-Scene"></div>
+  <div style="position: absolute; top: 0px; left: 47%">
+    <v-btn @click="reset">reset</v-btn
+    ><v-btn @click="printCamera">print camera</v-btn>
+  </div>
 </template>
 <script setup>
 import * as TWEEN from "@tweenjs/tween.js";
@@ -36,7 +38,8 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import blackHoleVertexShader from "./shaders/blackholeCursor/vertex.glsl";
 import blackHoleFragmentShader from "./shaders/blackholeCursor/fragment.glsl";
 let composer,
-  mouse,
+  cursor,
+  parallax,
   clickedTime,
   mouseMesh,
   scene,
@@ -45,12 +48,17 @@ let composer,
   renderer,
   camera,
   parameters,
-  mouseGetter;
+  cursorFieldForce,
+  cursorParallax,
+  elapsedTime,
+  deltaTime;
+let previousTime = 0;
 let pos = new THREE.Vector3();
 let clicked = false;
 let blackholeMass = 1500;
 let curblackholeMass = 0;
 let effectBlackHole;
+let cameraNormalize = new THREE.Vector3(0, 0, 0);
 const canvas = ref(null);
 const isHUDScene = ref(false);
 const cloudServer = ref(null);
@@ -61,35 +69,54 @@ labelRenderer = new CSS2DRenderer();
 THREE.ColorManagement.enabled = false;
 function onClickSuperComputing() {
   var from = camera.position.clone();
-  var to = camera.position.clone().set(-1, 0.1, 1);
+  var to = camera.position.clone().set(-3, 0.2, 0);
   var tween = new TWEEN.Tween(from)
     .to(to, 3000)
     .easing(TWEEN.Easing.Back.In)
+    .onStart(() => {
+      window.removeEventListener("mousemove", cursorParallax);
+      parallax = { x: 0, y: 0 };
+    })
     .onUpdate(function () {
       // console.log(from)
       camera.position.copy(from);
       camera.lookAt(0, 0, 0);
+      cameraNormalize = camera.rotation.clone();
     })
     .onComplete(function () {
-      window.removeEventListener("mousemove", mouseGetter);
+      // console.log(cameraNormalize);
+      window.removeEventListener("mousemove", cursorFieldForce);
+      window.addEventListener("mousemove", cursorParallax);
+
       pos.set(0, 0, 0);
     })
     .start();
   isHUDScene.value = true;
 }
+function printCamera() {
+  console.log(camera);
+}
 function reset() {
   var from = camera.position.clone();
-  var to = camera.position.clone().set(3, 3, 3);
+  var to = camera.position.clone().set(3, 3, 0);
   var tween = new TWEEN.Tween(from)
     .to(to, 3000)
     .easing(TWEEN.Easing.Cubic.Out)
+    .onStart(function () {
+      window.removeEventListener("mousemove", cursorParallax);
+      parallax = { x: 0, y: 0 };
+    })
     .onUpdate(function () {
-      // console.log(from)
+      console.log(parallax);
       camera.position.copy(from);
       camera.lookAt(0, 0, 0);
+      cameraNormalize = camera.rotation.clone();
     })
     .onComplete(function () {
-      window.addEventListener("mousemove", mouseGetter);
+      // console.log(cameraNormalize);
+      window.addEventListener("mousemove", cursorFieldForce);
+      window.addEventListener("mousemove", cursorParallax);
+
       pos.set(0, 0, 0);
     })
     .start();
@@ -129,7 +156,7 @@ onMounted(() => {
   parameters.count = 20000;
   parameters.size = 0.005;
   parameters.radius = 5;
-  parameters.branches = 3;
+  parameters.branches = 6;
   parameters.spin = 1;
   parameters.randomness = 0.5;
   parameters.randomnessPower = 3;
@@ -143,26 +170,36 @@ onMounted(() => {
   let geometry = null;
   let material = null;
   let points = null;
-  mouseGetter = (event) => {
+  cursorFieldForce = (event) => {
     let vector = new THREE.Vector3();
-    // mouse.x = e.pageX;
-    // mouse.y = -e.pageY + sizes.height;
-    // mouse.moved = true;
-    // console.log(mouse);
+    // cursor.x = e.pageX;
+    // cursor.y = -e.pageY + sizes.height;
+    // cursor.moved = true;
+    // console.log(cursor);
     event.preventDefault();
-    mouse.x = (event.clientX / sizes.width) * 2 - 1;
-    mouse.y = -(event.clientY / sizes.height) * 2 + 1;
+    cursor.x = (event.clientX / sizes.width) * 2 - 1;
+    cursor.y = -(event.clientY / sizes.height) * 2 + 1;
 
-    // Make the sphere follow the mouse
-    vector.x = mouse.x;
-    vector.y = mouse.y;
+    // Make the sphere follow the cursor
+    vector.x = cursor.x;
+    vector.y = cursor.y;
     vector.z = 0.5;
     vector.unproject(camera);
     var dir = vector.sub(camera.position).normalize();
     var distance = (0 - camera.position.y) / dir.y;
     pos = camera.position.clone().add(dir.multiplyScalar(distance));
     mouseMesh.position.copy(pos);
-    // console.log(mouse);
+    // console.log(cursor);
+  };
+  parallax = {
+    x: 0,
+    y: 0,
+  };
+  cursorParallax = (event) => {
+    parallax.x = event.clientX / sizes.width - 0.5;
+    parallax.y = (event.clientY / sizes.height - 0.5) * -1;
+
+    console.log(parallax);
   };
   // used for blackhole frag shader
   // now deprecated
@@ -182,7 +219,7 @@ onMounted(() => {
   const superComputingLabel = new CSS2DObject(
     { ...superComputing.value }.hudRef
   );
-  superComputingLabel.position.set(-1, 0, 1);
+  superComputingLabel.position.set(-3, 0, 0);
   superComputingLabel.center.set(0.5, 0.5);
   superComputingLabel.layers.set(0);
   console.log(superComputing.value);
@@ -198,19 +235,22 @@ onMounted(() => {
       material.dispose();
       scene.remove(points);
       // make sure only 1 instance running
-      window.removeEventListener("mousemove", mouseGetter);
+      window.removeEventListener("mousemove", cursorFieldForce);
+      window.addEventListener("mousemove", cursorParallax);
       // window.removeEventListener("mousedown", mouseDown);
       // window.removeEventListener("mouseup", mouseUp);
     }
     /**
      * EventListener
      */
-    mouse = {
+    cursor = {
       x: sizes.width / 2,
       y: sizes.height / 2,
       moved: false,
     };
-    window.addEventListener("mousemove", mouseGetter);
+    window.addEventListener("mousemove", cursorFieldForce);
+    window.addEventListener("mousemove", cursorParallax);
+
     // window.addEventListener("mousedown", mouseDown);
     // window.addEventListener("mouseup", mouseUp);
 
@@ -327,7 +367,7 @@ onMounted(() => {
     //     tDiffuse: { type: "t", value: null },
     //     opacity: { value: 1.0 },
     //     uResolution: { value: new THREE.Vector2(sizes.width, sizes.height) },
-    //     uMouse: { value: new THREE.Vector2(mouse.x, mouse.y) },
+    //     uMouse: { value: new THREE.Vector2(cursor.x, cursor.y) },
     //     uMass: { value: curblackholeMass * 0.00001 },
     //     uTime: { value: 0 },
     //     uClickedTime: { value: 0 },
@@ -439,6 +479,8 @@ onMounted(() => {
    * Camera
    */
   // Base camera
+  const cameraGroup = new THREE.Group();
+  scene.add(cameraGroup);
   camera = new THREE.PerspectiveCamera(
     60,
     sizes.width / sizes.height,
@@ -447,9 +489,14 @@ onMounted(() => {
   );
   camera.position.x = 3;
   camera.position.y = 3;
-  camera.position.z = 3;
+  camera.position.z = 0;
   camera.lookAt(0, 0, 0);
-  scene.add(camera);
+  cameraGroup.add(camera);
+  cameraNormalize = camera.rotation.clone();
+
+  const helper = new THREE.CameraHelper(camera);
+  scene.add(helper);
+  // scene.add(camera);
 
   // Controls
   // const controls = new OrbitControls(camera, canvas.value);
@@ -474,30 +521,45 @@ onMounted(() => {
    */
   const clock = new THREE.Clock();
 
-  const tick = () => {
-    const elapsedTime = clock.getElapsedTime();
+  const render = () => {
+    elapsedTime = clock.getElapsedTime();
+    deltaTime = elapsedTime - previousTime;
+    previousTime = elapsedTime;
+
     // const elapsedTime = parameters.elapsedTime;
-    if (curblackholeMass < blackholeMass - 50) {
-      curblackholeMass += (blackholeMass - curblackholeMass) * 0.03;
-    }
-    if (clicked) {
-      clickedTime += 0.03;
-    } else if (clickedTime > 0 && clicked == false) {
-      clickedTime += -(clickedTime * 0.015);
-    }
+
+    // blackhole shader time
+    // if (curblackholeMass < blackholeMass - 50) {
+    //   curblackholeMass += (blackholeMass - curblackholeMass) * 0.03;
+    // }
+    // if (clicked) {
+    //   clickedTime += 0.03;
+    // } else if (clickedTime > 0 && clicked == false) {
+    //   clickedTime += -(clickedTime * 0.015);
+    // }
+
     // Update controls
     // controls.update();
 
     // Update material
     material.uniforms.uTime.value = elapsedTime;
     material.uniforms.uMousePos.value.copy(pos);
-    // 黑洞扭曲效果
+    // update blackhole shader
     // effectBlackHole.uniforms.uTime.value = elapsedTime;
     // effectBlackHole.uniforms.uClickedTime.value = clickedTime;
-    // effectBlackHole.uniforms.uMouse.value = new THREE.Vector2(mouse.x, mouse.y);
+    // effectBlackHole.uniforms.uMouse.value = new THREE.Vector2(cursor.x, cursor.y);
 
     // Update material
     // material.uniforms.uSpeed.value = parameters.rotationSpeedFactor;
+    // parallax affect
+    const parallaxY = parallax.y * 0.3;
+    const parallaxX = parallax.x * 0.3;
+
+    camera.rotation.z +=
+      (parallaxX - camera.rotation.z + cameraNormalize.z) * deltaTime;
+    camera.rotation.y +=
+      (parallaxY - camera.rotation.y + cameraNormalize.y) * deltaTime;
+
     // Render
     renderer.render(scene, camera);
     labelRenderer.render(scene, camera);
@@ -506,7 +568,7 @@ onMounted(() => {
     // composer.render();
     // console.log(elapsedTime);
     // 递归调用渲染
-    window.requestAnimationFrame(tick);
+    window.requestAnimationFrame(render);
   };
   labelRenderer.setSize(sizes.width, sizes.height);
   labelRenderer.domElement.style.position = "absolute";
@@ -514,7 +576,7 @@ onMounted(() => {
   canvas.value.appendChild(renderer.domElement);
   canvas.value.appendChild(labelRenderer.domElement);
 
-  tick();
+  render();
 });
 onUnmounted(() => {
   gui.destroy();

@@ -1,6 +1,6 @@
 <template>
-  <!-- <science /> -->
-  <HUD ref="hud" :svg-type="0" style="margin:auto"/>
+  <science />
+  <!-- <HUD ref="hud" :svg-type="0" style="margin: auto" /> -->
 </template>
 <script setup>
 import { ref, onMounted } from "vue";
@@ -14,6 +14,9 @@ onMounted(() => {
 });
 </script>
 <style lang="scss" scoped>
+iframe {
+  border: none;
+}
 .icon__round {
   transform-origin: center;
   :deep(circle) {
