@@ -15,28 +15,39 @@
   </div>
 </template>
 <script setup>
+// 补间引擎
 import * as TWEEN from "@tweenjs/tween.js";
+// VUE3
 import { onMounted, onUnmounted, ref, computed } from "vue";
+// THREE 核心
+import * as THREE from "three";
+// 调试器
+import * as dat from "lil-gui";
+// vue组件
 import hud from "./components/2dHUD.vue";
+// 抽象方法
+import { releaseRenderer } from "@/util/three/releaseRenderer";
+// THREE addon
 import {
   CSS2DRenderer,
   CSS2DObject,
 } from "three/addons/renderers/CSS2DRenderer.js";
-import * as THREE from "three";
+import {
+  CSS3DRenderer,
+  CSS3DObject,
+} from "three/addons/renderers/CSS3DRenderer.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import * as dat from "lil-gui";
-import { releaseRenderer } from "@/util/three/releaseRenderer";
-import galaxyVertexShader from "./shaders/galaxy/vertex.glsl";
-import galaxyFragmentShader from "./shaders/galaxy/fragment.glsl";
-
 // PostProcessing
 import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
-// import { renderer } from "@/util/three/renderer";
+// shader
+import galaxyVertexShader from "./shaders/galaxy/vertex.glsl";
+import galaxyFragmentShader from "./shaders/galaxy/fragment.glsl";
 import blackHoleVertexShader from "./shaders/blackholeCursor/vertex.glsl";
 import blackHoleFragmentShader from "./shaders/blackholeCursor/fragment.glsl";
+
 let composer,
   cursor,
   parallax,
