@@ -1,21 +1,35 @@
 <template>
   <div v-show="!isHidden" ref="hudRef" style="color: white">
-    <div class="">Access</div>
-    <div>Cloud Server</div>
+    <div class="title">Access</div>
+    <div class="title" style="max-width:80px;">{{ productName }}</div>
     <div class="HUD-image">
-      <science v-if="svgType == 0" />
-      <compute v-else-if="svgType == 1" />
-      <brain v-else-if="svgType == 2" />
+      <science v-if="svgType == 1" />
+      <compute v-else-if="svgType == 2" />
+      <brain v-else-if="svgType == 3" />
     </div>
   </div>
 </template>
 <script setup>
-import { ref, defineProps } from "vue";
+import { ref, defineProps, computed } from "vue";
 import science from "@/assets/svg/galaxy/science.svg";
 import compute from "@/assets/svg/galaxy/compute.svg";
 import brain from "@/assets/svg/galaxy/brain.svg";
 const hudRef = ref(null);
-
+const productName = computed(() => {
+  let temp;
+  switch (props.svgType) {
+    case 1:
+      temp = "Cloud Server";
+      break;
+    case 2:
+      temp = "Super Computing";
+      break;
+    case 3:
+      temp = "Machine Learning";
+      break;
+  }
+  return temp;
+});
 const props = defineProps({
   svgType: Number,
   isHidden: { type: Boolean, default: false },
@@ -24,6 +38,9 @@ const props = defineProps({
 defineExpose({ hudRef });
 </script>
 <style lang="scss" scoped>
+.title{
+  font-size:14px;
+}
 .HUD-image {
   height: 80px;
   width: 80px;

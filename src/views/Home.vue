@@ -5,7 +5,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import science from "@/assets/svg/galaxy/science.svg";
-import HUD from "@/views/cases/galaxy-generator/components/2dHUD.vue";
+import HUD from "@/views/cases/galaxy-generator/components/logoHUD.vue";
 
 const hud = ref(null);
 

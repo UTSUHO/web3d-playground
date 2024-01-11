@@ -1,14 +1,44 @@
+<style lang="scss" scoped>
+.detail-HUD-container {
+  // position: absolute;
+  // width: 100%;
+  // height: 100%;
+}
+.HUD {
+  display: flex;
+  flex-direction: column;
+  &-header {
+    width: 100%;
+    height: 20%;
+  }
+  &-container {
+    width: 100%;
+    height: 60%;
+  }
+  &-footer {
+    width: 100%;
+    height: 20%;
+  }
+}
+</style>
 <template>
   <div ref="canvas" class="webgl"></div>
-  <hud ref="cloudServer" class="HUD-isHudHidden" v-show="false" :svg-type="0" />
-  <hud
+
+  <logoHud ref="cloudServer" class="HUD-isHudHidden" :svg-type="1" />
+  <logoHud
     ref="superComputing"
     class="HUD-isHudHidden"
     @pointerdown="onClickSuperComputing"
-    :svg-type="1"
+    :svg-type="2"
   />
-  <hud ref="HPC" class="HUD-isHudHidden" :svg-type="2" />
-  <div class="HUD-Scene"></div>
+  <logoHud ref="HPC" class="HUD-isHudHidden" :svg-type="3" />
+  <div class="detail-HUD-container HUD">
+    <div class="HUD-header"></div>
+    <div class="HUD-container">
+      <superComputingHUD ref="scHUD" :is-hidden="scenarioHidden(2)" />
+    </div>
+    <div class="HUD-footer"></div>
+  </div>
   <div style="position: absolute; top: 0px; left: 47%">
     <v-btn @click="reset">reset</v-btn
     ><v-btn @click="printCamera">print camera</v-btn>
@@ -24,7 +54,9 @@ import * as THREE from "three";
 // 调试器
 import * as dat from "lil-gui";
 // vue组件
-import hud from "./components/2dHUD.vue";
+import logoHud from "./components/logoHUD.vue";
+import superComputingHUD from "./components/superComputingHUD.vue";
+
 // 抽象方法
 import { releaseRenderer } from "@/util/three/releaseRenderer";
 // THREE addon
@@ -54,8 +86,10 @@ let composer,
   clickedTime,
   mouseMesh,
   scene,
+  css3DScene,
   gui,
-  labelRenderer,
+  label3DRenderer,
+  label2DRenderer,
   renderer,
   camera,
   parameters,
@@ -63,6 +97,8 @@ let composer,
   cursorParallax,
   elapsedTime,
   deltaTime;
+const css3DScale = 1000;
+let cssCameraPosition = new THREE.Vector3(3000, 3000, 0);
 let previousTime = 0;
 let pos = new THREE.Vector3();
 let clicked = false;
@@ -70,18 +106,27 @@ let blackholeMass = 1500;
 let curblackholeMass = 0;
 let effectBlackHole;
 let cameraNormalize = new THREE.Vector3(0, 0, 0);
+const dataModel = ref({
+  // 标记当前场景
+  sceneario: 0,
+  // 标记当前详情页
+  detailSceneario: 0,
+  // 标记详情卡片
+  detailCard: 0,
+});
 const canvas = ref(null);
 const isHUDScene = ref(false);
 const cloudServer = ref(null);
 const superComputing = ref(null);
+const scHUD = ref(null);
 const HPC = ref(null);
-labelRenderer = new CSS2DRenderer();
-
+label3DRenderer = new CSS3DRenderer();
+label2DRenderer = new CSS2DRenderer();
 THREE.ColorManagement.enabled = false;
 function onClickSuperComputing() {
   var from = camera.position.clone();
   var to = camera.position.clone().set(-3, 0.2, 0);
-  var tween = new TWEEN.Tween(from)
+  new TWEEN.Tween(from)
     .to(to, 3000)
     .easing(TWEEN.Easing.Back.In)
     .onStart(() => {
@@ -98,8 +143,8 @@ function onClickSuperComputing() {
       // console.log(cameraNormalize);
       window.removeEventListener("mousemove", cursorFieldForce);
       window.addEventListener("mousemove", cursorParallax);
-
       pos.set(0, 0, 0);
+      dataModel.value.detailSceneario = 2;
     })
     .start();
   isHUDScene.value = true;
@@ -110,15 +155,17 @@ function printCamera() {
 function reset() {
   var from = camera.position.clone();
   var to = camera.position.clone().set(3, 3, 0);
-  var tween = new TWEEN.Tween(from)
+  new TWEEN.Tween(from)
     .to(to, 3000)
     .easing(TWEEN.Easing.Cubic.Out)
     .onStart(function () {
       window.removeEventListener("mousemove", cursorParallax);
       parallax = { x: 0, y: 0 };
+      dataModel.value.sceneario = 1;
+      dataModel.value.detailSceneario = 0;
     })
     .onUpdate(function () {
-      console.log(parallax);
+      // console.log(parallax);
       camera.position.copy(from);
       camera.lookAt(0, 0, 0);
       cameraNormalize = camera.rotation.clone();
@@ -127,7 +174,6 @@ function reset() {
       // console.log(cameraNormalize);
       window.addEventListener("mousemove", cursorFieldForce);
       window.addEventListener("mousemove", cursorParallax);
-
       pos.set(0, 0, 0);
     })
     .start();
@@ -148,7 +194,10 @@ onMounted(() => {
 
   // Scene
   scene = new THREE.Scene();
-  // mouseMesh
+  css3DScene = new THREE.Scene();
+  css3DScene.scale.set(1 / css3DScale, 1 / css3DScale, 1 / css3DScale);
+
+  // 引力场 范围测试用 mouseMesh
   let ballGeometry = new THREE.SphereGeometry(0.5, 16, 8);
   var mouseMaterial = new THREE.MeshBasicMaterial({
     color: 0x0000ff,
@@ -177,6 +226,24 @@ onMounted(() => {
   parameters.rotationSpeedFactor = 0.01;
   parameters.elapsedTime = 10;
   parameters.fieldForceDivisor = 3;
+  /**
+   * Camera
+   */
+  // Base camera
+  const cameraGroup = new THREE.Group();
+  scene.add(cameraGroup);
+  camera = new THREE.PerspectiveCamera(
+    60,
+    sizes.width / sizes.height,
+    0.1,
+    100
+  );
+  camera.position.x = 3;
+  camera.position.y = 3;
+  camera.position.z = 0;
+  camera.lookAt(0, 0, 0);
+  cameraGroup.add(camera);
+  cameraNormalize = camera.rotation.clone();
 
   let geometry = null;
   let material = null;
@@ -210,7 +277,7 @@ onMounted(() => {
     parallax.x = event.clientX / sizes.width - 0.5;
     parallax.y = (event.clientY / sizes.height - 0.5) * -1;
 
-    console.log(parallax);
+    // console.log(parallax);
   };
   // used for blackhole frag shader
   // now deprecated
@@ -221,7 +288,7 @@ onMounted(() => {
     clicked = false;
   };
 
-  // label renderer
+  // 2d label renderer
   const cloudServerLabel = new CSS2DObject({ ...cloudServer.value }.hudRef);
   cloudServerLabel.position.set(1, 0, 1);
   cloudServerLabel.center.set(0.5, 0.5);
@@ -233,13 +300,19 @@ onMounted(() => {
   superComputingLabel.position.set(-3, 0, 0);
   superComputingLabel.center.set(0.5, 0.5);
   superComputingLabel.layers.set(0);
-  console.log(superComputing.value);
   scene.add(superComputingLabel);
   const HPCLabel = new CSS2DObject({ ...HPC.value }.hudRef);
   HPCLabel.position.set(1, 0, -1);
   HPCLabel.center.set(0.5, 0.5);
   HPCLabel.layers.set(0);
   scene.add(HPCLabel);
+  // 3d label renderer
+  console.log(scHUD.value);
+  const superComputingScene = new CSS3DObject({ ...scHUD.value }.sceneRef);
+  superComputingScene.position.set(-2300, -50, 0);
+  superComputingScene.layers.set(0);
+  css3DScene.add(superComputingScene);
+  superComputingScene.lookAt(new THREE.Vector3(-3000, 200, 0));
   const generateGalaxy = () => {
     if (points !== null) {
       geometry.dispose();
@@ -406,7 +479,7 @@ onMounted(() => {
     // });
     // composer.addPass(effectBlackHole);
   };
-  // GUI setting
+  // debug GUI setting
   gui
     .add(parameters, "count")
     .min(100)
@@ -486,24 +559,6 @@ onMounted(() => {
    */
   const axesHelper = new THREE.AxesHelper(5);
   scene.add(axesHelper);
-  /**
-   * Camera
-   */
-  // Base camera
-  const cameraGroup = new THREE.Group();
-  scene.add(cameraGroup);
-  camera = new THREE.PerspectiveCamera(
-    60,
-    sizes.width / sizes.height,
-    0.1,
-    100
-  );
-  camera.position.x = 3;
-  camera.position.y = 3;
-  camera.position.z = 0;
-  camera.lookAt(0, 0, 0);
-  cameraGroup.add(camera);
-  cameraNormalize = camera.rotation.clone();
 
   const helper = new THREE.CameraHelper(camera);
   scene.add(helper);
@@ -551,7 +606,6 @@ onMounted(() => {
 
     // Update controls
     // controls.update();
-
     // Update material
     material.uniforms.uTime.value = elapsedTime;
     material.uniforms.uMousePos.value.copy(pos);
@@ -573,7 +627,9 @@ onMounted(() => {
 
     // Render
     renderer.render(scene, camera);
-    labelRenderer.render(scene, camera);
+    label2DRenderer.render(scene, camera);
+    label3DRenderer.render(css3DScene, camera);
+
     TWEEN.update();
     // 启用后处理
     // composer.render();
@@ -581,13 +637,18 @@ onMounted(() => {
     // 递归调用渲染
     window.requestAnimationFrame(render);
   };
-  labelRenderer.setSize(sizes.width, sizes.height);
-  labelRenderer.domElement.style.position = "absolute";
-  labelRenderer.domElement.style.top = "0px";
+  label2DRenderer.setSize(sizes.width, sizes.height);
+  label2DRenderer.domElement.style.position = "absolute";
+  label2DRenderer.domElement.style.top = "0px";
+  label3DRenderer.setSize(sizes.width, sizes.height);
+  label3DRenderer.domElement.style.position = "absolute";
+  label3DRenderer.domElement.style.top = "0px";
   canvas.value.appendChild(renderer.domElement);
-  canvas.value.appendChild(labelRenderer.domElement);
+  canvas.value.appendChild(label2DRenderer.domElement);
+  canvas.value.appendChild(label3DRenderer.domElement);
 
   render();
+  console.log(scenarioHidden(2));
 });
 onUnmounted(() => {
   gui.destroy();
@@ -596,6 +657,9 @@ onUnmounted(() => {
 const isHudHidden = computed(() => {
   return isHUDScene.value == true ? "none" : "block";
 });
+function scenarioHidden(index) {
+  return !(dataModel.value.detailSceneario == index);
+}
 </script>
 <style lang="scss" scoped>
 .HUD-isHudHidden {
