@@ -648,7 +648,6 @@ onMounted(() => {
   canvas.value.appendChild(label3DRenderer.domElement);
 
   render();
-  console.log(scenarioHidden(2));
 });
 onUnmounted(() => {
   gui.destroy();

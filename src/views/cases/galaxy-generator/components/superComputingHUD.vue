@@ -1,5 +1,6 @@
 <script setup>
-import { ref, defineProps, computed } from "vue";
+import * as TWEEN from "@tweenjs/tween.js";
+import { ref, defineProps, computed, watch } from "vue";
 const sceneRef = ref(null);
 defineExpose({ sceneRef });
 const props = defineProps({
@@ -17,9 +18,7 @@ const cssHidden = computed(() => {
         Lorem ipsum dolor sit amet, falli liber aeterno sit ei. Cu mollis
         scaevola eos.
       </div>
-      <v-btn class="btn" variant="outlined"
-        >view our portfolio {{ isHidden }}</v-btn
-      >
+      <v-btn class="btn" variant="outlined">view our portfolio</v-btn>
     </div>
     <div class="business-bar">
       <div class="business-item">
@@ -78,5 +77,6 @@ const cssHidden = computed(() => {
 }
 .isSceneHudHidden {
   opacity: v-bind(cssHidden);
+  transition: opacity 1s;
 }
 </style>
