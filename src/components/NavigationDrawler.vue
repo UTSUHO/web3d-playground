@@ -38,6 +38,12 @@
         to="/galaxy-generator"
       ></v-list-item>
       <v-list-item
+        prepend-icon="mdi-consolidate"
+        title="Tres"
+        value="tres"
+        to="/tres"
+      ></v-list-item>
+      <v-list-item
         prepend-icon="mdi-stove"
         title="Bake Experiment"
         value="bake-experiment"
@@ -84,6 +90,12 @@
         title="WebGPU Conway's Game of Life"
         value="WebGPU"
         to="/WebGPU"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-wrench-outline"
+        title="Particle Fiber"
+        value="particleFiber"
+        to="/reverse-engineering"
       ></v-list-item>
     </v-list>
   </v-navigation-drawer>

@@ -2,7 +2,7 @@
   <v-app style="max-height: 100vh">
     <NavigationDrawler />
     <default-view />
-    <cursor-circle />
+    <!-- <cursor-circle /> -->
   </v-app>
 </template>
 

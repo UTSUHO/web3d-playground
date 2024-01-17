@@ -6,10 +6,12 @@ import { onMounted, onUnmounted, ref } from "vue";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as dat from "lil-gui";
+import { releaseRenderer } from "@/util/three/releaseRenderer";
+
 import testVertexShader from "./shaders/test/vertex.glsl";
 import testFragmentShader from "./shaders/test/fragment.glsl";
 
-let controls;
+let controls,camera;
 /**
  * Base
  */
@@ -27,7 +29,7 @@ const scene = new THREE.Scene();
  */
 // Geometry
 const geometry = new THREE.BoxGeometry(1, 1, 1);
-const planeGeometry = new THREE.PlaneGeometry( 1, 1 );
+const planeGeometry = new THREE.PlaneGeometry(1, 1);
 
 // Material
 const material = new THREE.ShaderMaterial({
@@ -38,7 +40,6 @@ const material = new THREE.ShaderMaterial({
 
 // Mesh
 const mesh = new THREE.Mesh(planeGeometry, material);
-
 
 scene.add(mesh);
 
@@ -68,7 +69,7 @@ window.addEventListener("resize", () => {
  * Camera
  */
 // Base camera
-const camera = new THREE.PerspectiveCamera(
+ camera = new THREE.PerspectiveCamera(
   75,
   sizes.width / sizes.height,
   0.1,
@@ -104,5 +105,8 @@ onMounted(() => {
   // controls = new OrbitControls(camera, renderer.domElement);
   // controls.enableDamping = true;
   render();
+});
+onUnmounted(() => {
+  releaseRenderer(renderer, scene);
 });
 </script>

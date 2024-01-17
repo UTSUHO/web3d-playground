@@ -14,12 +14,10 @@ const routes = [
         // which is lazy-loaded when the route is visited.
         redirect: "/home",
         children: [
-          
           {
             path: "home",
             name: "home",
-            component: () =>
-              import("@/views/Home.vue"),
+            component: () => import("@/views/Home.vue"),
           },
           {
             path: "wave",
@@ -35,44 +33,48 @@ const routes = [
           {
             path: "city",
             name: "city",
-            component: () =>
-              import("@/views/cases/city-model/Index.vue"),
+            component: () => import("@/views/cases/city-model/Index.vue"),
           },
           {
             path: "flyline",
             name: "flyline",
-            component: () =>
-              import("@/views/cases/flylines/Index.vue"),
+            component: () => import("@/views/cases/flylines/Index.vue"),
           },
           {
             path: "lottie",
             name: "lottie",
-            component: () =>
-              import("@/views/cases/lottie/Index.vue"),
+            component: () => import("@/views/cases/lottie/Index.vue"),
           },
           {
             path: "WebGPU",
             name: "WebGPU",
-            component: () =>
-              import("@/views/cases/WebGPU/Index.vue"),
+            component: () => import("@/views/cases/WebGPU/Index.vue"),
           },
           {
             path: "shader-practice",
             name: "shader-practice",
-            component: () =>
-              import("@/views/cases/shader-practice/Index.vue"),
+            component: () => import("@/views/cases/shader-practice/Index.vue"),
           },
           {
             path: "bake-experiment",
             name: "bake-experiment",
-            component: () =>
-              import("@/views/cases/bake-experiment/Index.vue"),
+            component: () => import("@/views/cases/bake-experiment/Index.vue"),
           },
           {
             path: "galaxy-generator",
             name: "galaxy-generator",
+            component: () => import("@/views/cases/galaxy-generator/Index.vue"),
+          },
+          {
+            path: "reverse-engineering",
+            name: "reverse-engineering",
             component: () =>
-              import("@/views/cases/galaxy-generator/Index.vue"),
+              import("@/views/cases/reverse-engineering/particleFiber/Index.vue"),
+          },
+          {
+            path: "tres",
+            name: "tres",
+            component: () => import("@/views/cases/tres/Index.vue"),
           },
         ],
       },
