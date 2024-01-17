@@ -4,12 +4,29 @@
   // width: 100%;
   // height: 100%;
 }
+.svg-icon-container {
+  margin-top:5vh;
+  display: flex;
+  justify-content: center;
+  .svg-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 16px;
+  }
+}
+
 .HUD {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  color: white;
+  pointer-events: none;
   &-header {
     width: 100%;
     height: 20%;
+    pointer-events: auto;
   }
   &-container {
     width: 100%;
@@ -18,30 +35,58 @@
   &-footer {
     width: 100%;
     height: 20%;
+    pointer-events: auto;
   }
 }
 </style>
 <template>
   <div ref="canvas" class="webgl"></div>
 
-  <logoHud ref="cloudServer" class="HUD-isHudHidden" :svg-type="1" />
+  <logoHud
+    ref="cloudServer"
+    class="HUD-isHudHidden"
+    @pointerdown="onClickCloudServer"
+    :svg-type="1"
+  />
   <logoHud
     ref="superComputing"
     class="HUD-isHudHidden"
     @pointerdown="onClickSuperComputing"
     :svg-type="2"
   />
-  <logoHud ref="HPC" class="HUD-isHudHidden" :svg-type="3" />
+  <logoHud
+    ref="HPC"
+    class="HUD-isHudHidden"
+    @pointerdown="onclickHPC"
+    :svg-type="3"
+  />
   <div class="detail-HUD-container HUD">
-    <div class="HUD-header"></div>
-    <div class="HUD-container">
-      <superComputingHUD ref="scHUD" :is-hidden="scenarioHidden(2)" />
+    <div class="HUD-header">
+      <v-btn
+        @click="reset"
+        variant="outlined"
+        style="margin-left: 10%; margin-top: 32px"
+        >Back</v-btn
+      >
     </div>
-    <div class="HUD-footer"></div>
+    <div class="HUD-container">
+      <cloudServerHUD ref="csHUD" :is-hidden="detailScenarioHidden(1)" />
+      <superComputingHUD ref="scHUD" :is-hidden="detailScenarioHidden(2)" />
+      <HPCHUD ref="hpcHUD" :is-hidden="detailScenarioHidden(3)" />
+    </div>
+    <div class="HUD-footer HUD-isHudShow">
+      <div class="svg-icon-container">
+        <science class="svg-icon" />
+        <compute class="svg-icon" />
+        <brain class="svg-icon" />
+      </div>
+    </div>
   </div>
-  <div style="position: absolute; top: 0px; left: 47%">
-    <v-btn @click="reset">reset</v-btn
-    ><v-btn @click="printCamera">print camera</v-btn>
+  <div style="position: absolute; top: 0px; left: 20%">
+    <v-btn @click="printCamera">print camera</v-btn>
+    <v-btn @click="rotateY">rotate Y axis</v-btn>
+    <v-btn @click="rotateZ">rotate Z axis</v-btn>
+    <v-btn @click="rotateX">rotate X axis</v-btn>
   </div>
 </template>
 <script setup>
@@ -56,7 +101,12 @@ import * as dat from "lil-gui";
 // vue组件
 import logoHud from "./components/logoHUD.vue";
 import superComputingHUD from "./components/superComputingHUD.vue";
-
+import cloudServerHUD from "./components/cloudServerHUD.vue";
+import HPCHUD from "./components/HPCHUD.vue";
+// svg资源
+import science from "@/assets/svg/galaxy/science.svg";
+import compute from "@/assets/svg/galaxy/compute.svg";
+import brain from "@/assets/svg/galaxy/brain.svg";
 // 抽象方法
 import { releaseRenderer } from "@/util/three/releaseRenderer";
 // THREE addon
@@ -92,6 +142,7 @@ let composer,
   label2DRenderer,
   renderer,
   camera,
+  cameraGroup,
   parameters,
   cursorFieldForce,
   cursorParallax,
@@ -108,17 +159,20 @@ let effectBlackHole;
 let cameraNormalize = new THREE.Vector3(0, 0, 0);
 const dataModel = ref({
   // 标记当前场景
-  sceneario: 0,
+  scenario: 1,
   // 标记当前详情页
-  detailSceneario: 0,
+  detailscenario: 0,
   // 标记详情卡片
   detailCard: 0,
 });
 const canvas = ref(null);
 const isHUDScene = ref(false);
+
 const cloudServer = ref(null);
 const superComputing = ref(null);
+const csHUD = ref(null);
 const scHUD = ref(null);
+const hpcHUD = ref(null);
 const HPC = ref(null);
 label3DRenderer = new CSS3DRenderer();
 label2DRenderer = new CSS2DRenderer();
@@ -126,6 +180,33 @@ THREE.ColorManagement.enabled = false;
 function onClickSuperComputing() {
   var from = camera.position.clone();
   var to = camera.position.clone().set(-3, 0.2, 0);
+  new TWEEN.Tween(from)
+    .to(to, 3000)
+    .easing(TWEEN.Easing.Back.In)
+    .onStart(() => {
+      window.removeEventListener("mousemove", cursorParallax);
+      parallax = { x: 0, y: 0 };
+      dataModel.value.scenario = 2;
+    })
+    .onUpdate(function () {
+      // console.log(from)
+      camera.position.copy(from);
+      camera.lookAt(0, 0, 0);
+      cameraNormalize = camera.rotation.clone();
+    })
+    .onComplete(function () {
+      // console.log(cameraNormalize);
+      window.removeEventListener("mousemove", cursorFieldForce);
+      window.addEventListener("mousemove", cursorParallax);
+      pos.set(0, 0, 0);
+      dataModel.value.detailscenario = 2;
+    })
+    .start();
+  isHUDScene.value = true;
+}
+function onClickCloudServer() {
+  var from = camera.position.clone();
+  var to = camera.position.clone().set(1, 0.2, 1);
   new TWEEN.Tween(from)
     .to(to, 3000)
     .easing(TWEEN.Easing.Back.In)
@@ -144,13 +225,40 @@ function onClickSuperComputing() {
       window.removeEventListener("mousemove", cursorFieldForce);
       window.addEventListener("mousemove", cursorParallax);
       pos.set(0, 0, 0);
-      dataModel.value.detailSceneario = 2;
+      dataModel.value.detailscenario = 1;
+    })
+    .start();
+  isHUDScene.value = true;
+}
+function onclickHPC() {
+  var from = camera.position.clone();
+  var to = camera.position.clone().set(1, 0.2, -1);
+  new TWEEN.Tween(from)
+    .to(to, 3000)
+    .easing(TWEEN.Easing.Back.In)
+    .onStart(() => {
+      window.removeEventListener("mousemove", cursorParallax);
+      parallax = { x: 0, y: 0 };
+    })
+    .onUpdate(function () {
+      // console.log(from)
+      camera.position.copy(from);
+      camera.lookAt(0, 0, 0);
+      cameraNormalize = camera.rotation.clone();
+    })
+    .onComplete(function () {
+      // console.log(cameraNormalize);
+      window.removeEventListener("mousemove", cursorFieldForce);
+      window.addEventListener("mousemove", cursorParallax);
+      pos.set(0, 0, 0);
+      dataModel.value.detailscenario = 3;
     })
     .start();
   isHUDScene.value = true;
 }
 function printCamera() {
   console.log(camera);
+  console.log(cameraGroup.rotation);
 }
 function reset() {
   var from = camera.position.clone();
@@ -161,8 +269,10 @@ function reset() {
     .onStart(function () {
       window.removeEventListener("mousemove", cursorParallax);
       parallax = { x: 0, y: 0 };
-      dataModel.value.sceneario = 1;
-      dataModel.value.detailSceneario = 0;
+      dataModel.value.detailscenario = 0;
+      setTimeout(() => {
+        dataModel.value.scenario = 1;
+      }, "2000");
     })
     .onUpdate(function () {
       // console.log(parallax);
@@ -175,9 +285,21 @@ function reset() {
       window.addEventListener("mousemove", cursorFieldForce);
       window.addEventListener("mousemove", cursorParallax);
       pos.set(0, 0, 0);
+      isHUDScene.value = false;
     })
     .start();
-  isHUDScene.value = !isHUDScene.value;
+}
+function rotateY() {
+  cameraGroup.rotation.y += 1;
+  console.log(cameraGroup.rotation);
+}
+function rotateZ() {
+  cameraGroup.rotation.z += 1;
+  console.log(cameraGroup.rotation);
+}
+function rotateX() {
+  cameraGroup.rotation.x += 1;
+  console.log(cameraGroup.rotation);
 }
 onMounted(() => {
   /**
@@ -230,7 +352,7 @@ onMounted(() => {
    * Camera
    */
   // Base camera
-  const cameraGroup = new THREE.Group();
+  cameraGroup = new THREE.Group();
   scene.add(cameraGroup);
   camera = new THREE.PerspectiveCamera(
     60,
@@ -238,13 +360,16 @@ onMounted(() => {
     0.1,
     100
   );
+  cameraGroup.position.x = 0;
+  cameraGroup.position.y = 0;
+  cameraGroup.position.z = 0;
+  cameraGroup.lookAt(0, 0, 0);
   camera.position.x = 3;
   camera.position.y = 3;
   camera.position.z = 0;
   camera.lookAt(0, 0, 0);
   cameraGroup.add(camera);
   cameraNormalize = camera.rotation.clone();
-
   let geometry = null;
   let material = null;
   let points = null;
@@ -259,12 +384,20 @@ onMounted(() => {
     cursor.y = -(event.clientY / sizes.height) * 2 + 1;
 
     // Make the sphere follow the cursor
+    // 基于cameragroup视差增加参数
+    // parallax.x增加 = vector.x增加，y减少
+    // parallax.x减少 = vector.x减少，y增加
+    // parallax.y增加 = vector.y减少
+    // parallax.y减少 = vector.y增加
+    // vector.x = cursor.x - parallax.x*0.15;
+    // vector.y = cursor.y - parallax.y * 0.5 - parallax.x*0.075;
     vector.x = cursor.x;
     vector.y = cursor.y;
     vector.z = 0.5;
     vector.unproject(camera);
     var dir = vector.sub(camera.position).normalize();
     var distance = (0 - camera.position.y) / dir.y;
+    // console.log(cursor, vector);
     pos = camera.position.clone().add(dir.multiplyScalar(distance));
     mouseMesh.position.copy(pos);
     // console.log(cursor);
@@ -307,12 +440,22 @@ onMounted(() => {
   HPCLabel.layers.set(0);
   scene.add(HPCLabel);
   // 3d label renderer
-  console.log(scHUD.value);
+  // console.log(scHUD.value);
+  const cloudServerScene = new CSS3DObject({ ...csHUD.value }.sceneRef);
+  cloudServerScene.position.set(500, 100, 500);
+  cloudServerScene.layers.set(0);
+  css3DScene.add(cloudServerScene);
+  cloudServerScene.lookAt(new THREE.Vector3(1000, 200, 1000));
   const superComputingScene = new CSS3DObject({ ...scHUD.value }.sceneRef);
-  superComputingScene.position.set(-2300, -50, 0);
+  superComputingScene.position.set(-2300, 100, 0);
   superComputingScene.layers.set(0);
   css3DScene.add(superComputingScene);
   superComputingScene.lookAt(new THREE.Vector3(-3000, 200, 0));
+  const hpcScene = new CSS3DObject({ ...hpcHUD.value }.sceneRef);
+  hpcScene.position.set(500, 100, -500);
+  hpcScene.layers.set(0);
+  css3DScene.add(hpcScene);
+  hpcScene.lookAt(new THREE.Vector3(1000, 200, -1000));
   const generateGalaxy = () => {
     if (points !== null) {
       geometry.dispose();
@@ -422,9 +565,11 @@ onMounted(() => {
       vertexShader: galaxyVertexShader,
       fragmentShader: galaxyFragmentShader,
       onBeforeCompile: (shader) => {
-        // console.log(shader.vertexShader);
+        // console.log(shader);
       },
     });
+    console.log(material);
+    const testMaterial = new THREE.PointsMaterial();
     /**
      * Shader
      */
@@ -617,9 +762,13 @@ onMounted(() => {
     // Update material
     // material.uniforms.uSpeed.value = parameters.rotationSpeedFactor;
     // parallax affect
-    const parallaxY = parallax.y * 0.3;
-    const parallaxX = parallax.x * 0.3;
-
+    const parallaxY = parallax.y * 0.05;
+    const parallaxX = parallax.x * 0.05;
+    // camera group based
+    // cameraGroup.rotation.y +=
+    //   (parallaxX - cameraGroup.rotation.y) * 0.5 * deltaTime;
+    // cameraGroup.rotation.z +=
+    //   (parallaxY - cameraGroup.rotation.z) * 0.5 * deltaTime;
     camera.rotation.z +=
       (parallaxX - camera.rotation.z + cameraNormalize.z) * deltaTime;
     camera.rotation.y +=
@@ -654,14 +803,64 @@ onUnmounted(() => {
   releaseRenderer(renderer, scene);
 });
 const isHudHidden = computed(() => {
-  return isHUDScene.value == true ? "none" : "block";
+  return dataModel.value.scenario == 1 ? "1" : "0";
 });
+const isHudShow = computed(() => {
+  return dataModel.value.scenario == 1 ? "0" : "1";
+});
+function detailScenarioHidden(index) {
+  return !(dataModel.value.detailscenario == index);
+}
 function scenarioHidden(index) {
-  return !(dataModel.value.detailSceneario == index);
+  return dataModel.value.scenario == index;
 }
 </script>
 <style lang="scss" scoped>
 .HUD-isHudHidden {
-  display: v-bind(isHudHidden);
+  opacity: v-bind(isHudHidden);
+}
+.HUD-isHudShow{
+  opacity: v-bind(isHudShow);
+}
+.icon__round {
+  transform-origin: center;
+  :deep(circle) {
+    stroke: #6d48ff;
+    stroke-width: 1;
+    &.icon__default-circle {
+      stroke: #6d48ff;
+      fill: none;
+      opacity: 1;
+      transform: scale3D(1, 1, 1);
+    }
+    &.icon__second-circle {
+      fill: none;
+      opacity: 0.5;
+      transform: scale3d(0.9, 0.9, 1);
+    }
+    &.icon__third-circle {
+      fill: none;
+      opacity: 0.3;
+      transform: scale3d(0.8, 0.8, 1);
+    }
+    &.icon__background-circle {
+      opacity: 0.4;
+      stroke: none !important;
+    }
+  }
+  ::v-deep .icon__content {
+    color: white;
+    fill: rgb(109, 72, 255);
+    &-shine {
+      filter: blur(0px);
+      opacity: 0.6;
+      fill: white;
+      &-permanent {
+        filter: blur(0.5px);
+        opacity: 0.5;
+        fill: white;
+      }
+    }
+  }
 }
 </style>

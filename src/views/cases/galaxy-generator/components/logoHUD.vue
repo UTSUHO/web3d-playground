@@ -1,7 +1,12 @@
 <template>
-  <div v-show="!isHidden" ref="hudRef" style="color: white">
+  <div
+    v-show="!isHidden"
+    ref="hudRef"
+    class="HUD-logo-container"
+    style="color: white"
+  >
     <div class="title">Access</div>
-    <div class="title" style="max-width:80px;">{{ productName }}</div>
+    <div class="title" style="max-width: 80px">{{ productName }}</div>
     <div class="HUD-image">
       <science v-if="svgType == 1" />
       <compute v-else-if="svgType == 2" />
@@ -25,7 +30,7 @@ const productName = computed(() => {
       temp = "Super Computing";
       break;
     case 3:
-      temp = "Machine Learning";
+      temp = "High Performance Computing";
       break;
   }
   return temp;
@@ -38,8 +43,11 @@ const props = defineProps({
 defineExpose({ hudRef });
 </script>
 <style lang="scss" scoped>
-.title{
-  font-size:14px;
+.title {
+  font-size: 14px;
+}
+.HUD-logo-container {
+  transition: opacity 1s;
 }
 .HUD-image {
   height: 80px;

@@ -9,19 +9,16 @@ const props = defineProps({
 const cssHidden = computed(() => {
   return props.isHidden == true ? "0" : "1";
 });
-function jump(){
-  alert('wtf')
-}
 </script>
 <template>
   <div ref="sceneRef" class="anime-container isSceneHudHidden">
     <div class="content-container">
-      <div class="title">Super Computing</div>
+      <div class="title">Cloud Server</div>
       <div class="paragraph">
         Lorem ipsum dolor sit amet, falli liber aeterno sit ei. Cu mollis
         scaevola eos.
       </div>
-      <v-btn class="btn" variant="outlined" @click="jump()">view our portfolio</v-btn>
+      <v-btn class="btn" variant="outlined">view our portfolio</v-btn>
     </div>
     <div class="business-bar">
       <div class="business-item">

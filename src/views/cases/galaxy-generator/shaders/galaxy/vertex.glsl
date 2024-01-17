@@ -13,7 +13,7 @@ vec3 forceField(vec3 segment, vec3 transformedObj) {
     float dist = length(segment);
     float force = clamp(1. / (dist * dist), 0., 1.);
     if(dist < uBlackholeRadius) {
-        transformedObj += dir * force/uFieldForceDivisor;
+        transformedObj += dir * force / uFieldForceDivisor;
     }
     return transformedObj;
 }
@@ -33,47 +33,6 @@ void main() {
     angle += angleOffset;
     modelPosition.x = cos(angle) * distanceToCenter;
     modelPosition.z = sin(angle) * distanceToCenter;
-
-    // // phase1
-    // if(modelPosition.x < sqrt(pow(.2, 2.0) - pow(modelPosition.x, 2.0))
-    // &&  modelPosition.x > 0.0
-    // && modelPosition.z < sqrt(pow(.2, 2.0) - pow(modelPosition.z, 2.0))
-    // &&  modelPosition.z > 0.0
-    // ) {
-
-    //     modelPosition.x = sqrt(pow(.2, 2.0) - pow(modelPosition.x, 2.0));
-    //     modelPosition.z = sqrt(pow(.2, 2.0) - pow(modelPosition.z, 2.0));
-    // }
-    // // phase2
-    // if(modelPosition.x < sqrt(pow(.2, 2.0) - pow(modelPosition.x, 2.0))
-    // &&  modelPosition.x > 0.0
-    // && modelPosition.z > -sqrt(pow(.2, 2.0) - pow(modelPosition.z, 2.0))
-    // &&  modelPosition.z < 0.0
-    // ) {
-
-    //     modelPosition.x = sqrt(pow(.2, 2.0) - pow(modelPosition.x, 2.0));
-    //     modelPosition.z = -sqrt(pow(.2, 2.0) - pow(modelPosition.z, 2.0));
-    // }
-    // // phase3
-    // if(modelPosition.x > -sqrt(pow(.2, 2.0) - pow(modelPosition.x, 2.0)) 
-    // &&  modelPosition.x < 0.0
-    // && modelPosition.z > -sqrt(pow(.2, 2.0) - pow(modelPosition.z, 2.0))
-    // &&  modelPosition.z < 0.0
-    // ) {
-
-    //     modelPosition.x = -sqrt(pow(.2, 2.0) - pow(modelPosition.x, 2.0));
-    //     modelPosition.z = -sqrt(pow(.2, 2.0) - pow(modelPosition.z, 2.0));
-    // }
-    // // phase4
-    // if(modelPosition.x > -sqrt(pow(.2, 2.0) - pow(modelPosition.x, 2.0))
-    // &&  modelPosition.x < 0.0
-    // && modelPosition.z < sqrt(pow(.2, 2.0) - pow(modelPosition.z, 2.0))
-    // &&  modelPosition.z > 0.0
-    // ) {
-
-    //     modelPosition.x = -sqrt(pow(.2, 2.0) - pow(modelPosition.x, 2.0));
-    //     modelPosition.z = sqrt(pow(.2, 2.0) - pow(modelPosition.z, 2.0));
-    // }
 
     modelPosition.xyz += aRandomness;
 
