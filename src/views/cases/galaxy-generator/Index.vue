@@ -5,7 +5,7 @@
   // height: 100%;
 }
 .svg-icon-container {
-  margin-top:5vh;
+  margin-top: 5vh;
   display: flex;
   justify-content: center;
   .svg-icon {
@@ -103,6 +103,7 @@ import logoHud from "./components/logoHUD.vue";
 import superComputingHUD from "./components/superComputingHUD.vue";
 import cloudServerHUD from "./components/cloudServerHUD.vue";
 import HPCHUD from "./components/HPCHUD.vue";
+import { init, particleCPUAnimation } from "./components/brainAnimation.js";
 // svg资源
 import science from "@/assets/svg/galaxy/science.svg";
 import compute from "@/assets/svg/galaxy/compute.svg";
@@ -147,7 +148,8 @@ let composer,
   cursorFieldForce,
   cursorParallax,
   elapsedTime,
-  deltaTime;
+  deltaTime,
+  brainData;
 const css3DScale = 1000;
 let cssCameraPosition = new THREE.Vector3(3000, 3000, 0);
 let previousTime = 0;
@@ -200,6 +202,8 @@ function onClickSuperComputing() {
       window.addEventListener("mousemove", cursorParallax);
       pos.set(0, 0, 0);
       dataModel.value.detailscenario = 2;
+      scene.add(brainData["tubeMesh"]);
+      scene.add(brainData["particleMesh"]);
     })
     .start();
   isHUDScene.value = true;
@@ -213,6 +217,7 @@ function onClickCloudServer() {
     .onStart(() => {
       window.removeEventListener("mousemove", cursorParallax);
       parallax = { x: 0, y: 0 };
+      dataModel.value.scenario = 2;
     })
     .onUpdate(function () {
       // console.log(from)
@@ -239,6 +244,7 @@ function onclickHPC() {
     .onStart(() => {
       window.removeEventListener("mousemove", cursorParallax);
       parallax = { x: 0, y: 0 };
+      dataModel.value.scenario = 2;
     })
     .onUpdate(function () {
       // console.log(from)
@@ -270,6 +276,8 @@ function reset() {
       window.removeEventListener("mousemove", cursorParallax);
       parallax = { x: 0, y: 0 };
       dataModel.value.detailscenario = 0;
+      scene.remove(brainData["tubeMesh"]);
+      scene.remove(brainData["particleMesh"]);
       setTimeout(() => {
         dataModel.value.scenario = 1;
       }, "2000");
@@ -579,6 +587,8 @@ onMounted(() => {
      */
     points = new THREE.Points(geometry, material);
     scene.add(points);
+    brainData = init(scene);
+
     // console.log(scene);
     /**
      * post-processing
@@ -731,7 +741,7 @@ onMounted(() => {
    * Animate
    */
   const clock = new THREE.Clock();
-
+  console.log(brainData);
   const render = () => {
     elapsedTime = clock.getElapsedTime();
     deltaTime = elapsedTime - previousTime;
@@ -773,7 +783,7 @@ onMounted(() => {
       (parallaxX - camera.rotation.z + cameraNormalize.z) * deltaTime;
     camera.rotation.y +=
       (parallaxY - camera.rotation.y + cameraNormalize.y) * deltaTime;
-
+    particleCPUAnimation(brainData["particleGeometry"], brainData["myPoints"]);
     // Render
     renderer.render(scene, camera);
     label2DRenderer.render(scene, camera);
@@ -819,7 +829,7 @@ function scenarioHidden(index) {
 .HUD-isHudHidden {
   opacity: v-bind(isHudHidden);
 }
-.HUD-isHudShow{
+.HUD-isHudShow {
   opacity: v-bind(isHudShow);
 }
 .icon__round {
