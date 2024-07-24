@@ -112,6 +112,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .v-list-item--link {
-  cursor: none;
+  // cursor: none;
 }
 </style>
