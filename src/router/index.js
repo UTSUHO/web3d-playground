@@ -76,6 +76,11 @@ const routes = [
             name: "tres",
             component: () => import("@/views/cases/tres/Index.vue"),
           },
+          {
+            path: "hdri",
+            name: "hdri",
+            component: () => import("@/views/cases/HDRI-demo/Index.vue"),
+          },
         ],
       },
     ],

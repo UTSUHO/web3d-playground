@@ -1,5 +1,3 @@
-import { onMounted } from 'vue'; import { onUnmounted } from 'vue'; import {
-onMounted } from 'vue';
 <template>
   <canvas class="webgl"></canvas>
 </template>

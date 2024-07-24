@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@mdi/font": "7.0.96",
+    "@monogrid/gainmap-js": "^3.0.5",
     "@tresjs/core": "^3.6.1",
     "@tweenjs/tween.js": "^21.0.0",
     "camera-controls": "^2.7.3",

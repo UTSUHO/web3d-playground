@@ -38,6 +38,12 @@
         to="/galaxy-generator"
       ></v-list-item>
       <v-list-item
+        prepend-icon="mdi-panorama-variant-outline"
+        title="HDRI"
+        value="hdri"
+        to="/hdri"
+      ></v-list-item>
+      <v-list-item
         prepend-icon="mdi-consolidate"
         title="Tres"
         value="tres"
