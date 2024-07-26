@@ -172,10 +172,11 @@ const isHUDScene = ref(false);
 
 const cloudServer = ref(null);
 const superComputing = ref(null);
+const HPC = ref(null);
+
 const csHUD = ref(null);
 const scHUD = ref(null);
 const hpcHUD = ref(null);
-const HPC = ref(null);
 label3DRenderer = new CSS3DRenderer();
 label2DRenderer = new CSS2DRenderer();
 THREE.ColorManagement.enabled = false;

@@ -1,5 +1,8 @@
 <template>
 	<div ref="canvas"></div>
+	<logoHud ref="cloudServer" class="HUD-isHudHidden" :svg-type="1" />
+	<logoHud ref="superComputing" class="HUD-isHudHidden" :svg-type="2" />
+	<logoHud ref="HPC" class="HUD-isHudHidden" :svg-type="3" />
 </template>
 
 <script setup>
@@ -11,11 +14,15 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-
 import { HDRJPGLoader } from '@monogrid/gainmap-js';
+import logoHud from "@/views/cases/galaxy-generator/components/logoHUD.vue";
+
+import {
+	CSS2DRenderer,
+	CSS2DObject,
+} from "three/addons/renderers/CSS2DRenderer.js";
 
 const params = {
-	envMap: 'HDR',
 	roughness: 0.0,
 	metalness: 1.0,
 	exposure: 1.0,
@@ -26,35 +33,57 @@ const canvas = ref(null);
 
 
 let container, stats;
-let camera, scene, renderer, controls;
+let camera, scene, renderer, controls, label2DRenderer;
 let torusMesh, planeMesh;
 let hdrJpg, hdrJpgPMREMRenderTarget, hdrJpgEquirectangularMap;
 let hdrPMREMRenderTarget, hdrEquirectangularMap;
+label2DRenderer = new CSS2DRenderer();
 
+const cloudServer = ref(null);
+const superComputing = ref(null);
+const HPC = ref(null);
 
 const fileSizes = {};
 const resolutions = {};
 
 onMounted(() => {
 	init();
-
+	// 2d label renderer
+	const cloudServerLabel = new CSS2DObject({ ...cloudServer.value }.hudRef);
+	cloudServerLabel.position.set(100, 0, 100);
+	cloudServerLabel.center.set(0.5, 0.5);
+	cloudServerLabel.layers.set(0);
+	scene.add(cloudServerLabel);
+	const superComputingLabel = new CSS2DObject(
+		{ ...superComputing.value }.hudRef
+	);
+	superComputingLabel.position.set(-100, 0, 100);
+	superComputingLabel.center.set(0.5, 0.5);
+	superComputingLabel.layers.set(0);
+	scene.add(superComputingLabel);
+	const HPCLabel = new CSS2DObject({ ...HPC.value }.hudRef);
+	HPCLabel.position.set(-100, 0,-100);
+	HPCLabel.center.set(0.5, 0.5);
+	HPCLabel.layers.set(0);
+	scene.add(HPCLabel);
 })
 
 function init() {
 
 	// const lbl = document.getElementById('lbl_left');
 
-	container = document.createElement('div');
-	canvas.value.appendChild(container);
+	// container = document.createElement('div');
+	// canvas.value.appendChild(container);
 
-	camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 500);
-	camera.position.set(0, 0, - 120);
+	camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 500);
+	camera.position.set(0, 0, 0.1);
 
 	scene = new THREE.Scene();
 
 	renderer = new THREE.WebGLRenderer();
 	renderer.toneMapping = THREE.ACESFilmicToneMapping;
-
+	const axesHelper = new THREE.AxesHelper( 100 );
+	scene.add( axesHelper );
 	//
 
 	let geometry = new THREE.TorusKnotGeometry(18, 8, 200, 40, 1, 3);
@@ -72,7 +101,7 @@ function init() {
 	material = new THREE.MeshBasicMaterial();
 
 	planeMesh = new THREE.Mesh(geometry, material);
-	planeMesh.position.y = - 50;
+	planeMesh.position.y = - 0;
 	planeMesh.rotation.x = - Math.PI * 0.5;
 	scene.add(planeMesh);
 
@@ -88,31 +117,43 @@ function init() {
 
 
 
-	hdrJpg = new HDRJPGLoader(renderer)
-		.load('textures/hdri/anniversary_lounge_4k.hdr.jpg', function () {
+	// hdrJpg = new HDRJPGLoader(renderer)
+	// 	.load('textures/hdri/anniversary_lounge_4k.hdr.jpg', function () {
 
-			resolutions['HDR JPG'] = hdrJpg.width + 'x' + hdrJpg.height;
+	// 		resolutions['HDR JPG'] = hdrJpg.width + 'x' + hdrJpg.height;
 
-			displayStats('HDR JPG');
+	// 		displayStats('HDR JPG');
 
-			hdrJpgEquirectangularMap = hdrJpg.renderTarget.texture;
-			hdrJpgPMREMRenderTarget = pmremGenerator.fromEquirectangular(hdrJpgEquirectangularMap);
+	// 		hdrJpgEquirectangularMap = hdrJpg.renderTarget.texture;
+	// 		hdrJpgPMREMRenderTarget = pmremGenerator.fromEquirectangular(hdrJpgEquirectangularMap);
 
-			hdrJpgEquirectangularMap.mapping = THREE.EquirectangularReflectionMapping;
-			hdrJpgEquirectangularMap.needsUpdate = true;
+	// 		hdrJpgEquirectangularMap.mapping = THREE.EquirectangularReflectionMapping;
+	// 		hdrJpgEquirectangularMap.needsUpdate = true;
 
-			hdrJpg.dispose();
+	// 		hdrJpg.dispose();
 
-		}, function (progress) {
+	// 	}, function (progress) {
 
-			fileSizes['HDR JPG'] = humanFileSize(progress.total);
+	// 		fileSizes['HDR JPG'] = humanFileSize(progress.total);
 
-		});
+	// 	});
+	const panoramaGeometry = new THREE.SphereGeometry(100, 60, 40);
+	// invert the geometry on the x-axis so that all of the faces point inward
+	panoramaGeometry.scale(- 1, 1, 1);
+	const texture = new THREE.TextureLoader().load('textures/hdri/2294472375_24a3b8ef46_o.jpg');
+	texture.colorSpace = THREE.SRGBColorSpace;
+	const panoramaMaterial = new THREE.MeshBasicMaterial({ map: texture });
+
+	const panoramaMesh = new THREE.Mesh(panoramaGeometry, panoramaMaterial);
+	scene.add( panoramaMesh );
+
 
 	hdrEquirectangularMap = new RGBELoader()
-		.load('textures/hdri/anniversary_lounge_4k.hdr', function () {
+		.load('textures/hdri/anniversary_lounge_4k.hdr', function (texture) {
 
 			resolutions['HDR'] = hdrEquirectangularMap.image.width + 'x' + hdrEquirectangularMap.image.height;
+
+
 
 			hdrPMREMRenderTarget = pmremGenerator.fromEquirectangular(hdrEquirectangularMap);
 
@@ -130,20 +171,25 @@ function init() {
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.setAnimationLoop(animate);
-	container.appendChild(renderer.domElement);
+	// container.appendChild(renderer.domElement);
 
-	stats = new Stats();
-	container.appendChild(stats.dom);
+	// stats = new Stats();
+	// container.appendChild(stats.dom);
+	label2DRenderer.setSize(window.innerWidth, window.innerHeight);
+	label2DRenderer.domElement.style.position = "absolute";
+	label2DRenderer.domElement.style.top = "0px";
 
-	controls = new OrbitControls(camera, renderer.domElement);
-	controls.minDistance = 50;
-	controls.maxDistance = 300;
+	canvas.value.appendChild(renderer.domElement);
+	canvas.value.appendChild(label2DRenderer.domElement);
+	controls = new OrbitControls(camera, label2DRenderer.domElement);
+	// controls.minDistance = 0;
+	// controls.maxDistance = 5;
 
 	window.addEventListener('resize', onWindowResize);
 
 	const gui = new GUI();
 
-	gui.add(params, 'envMap', ['HDR JPG', 'HDR']).onChange(displayStats);
+	// gui.add(params, 'envMap', ['HDR JPG', 'HDR']).onChange(displayStats);
 	gui.add(params, 'roughness', 0, 1, 0.01);
 	gui.add(params, 'metalness', 0, 1, 0.01);
 	gui.add(params, 'exposure', 0, 2, 0.01);
@@ -201,9 +247,9 @@ function onWindowResize() {
 
 function animate() {
 
-	stats.begin();
+	// stats.begin();
 	render();
-	stats.end();
+	// stats.end();
 
 }
 
@@ -214,18 +260,18 @@ function render() {
 
 	let pmremRenderTarget, equirectangularMap;
 
-	switch (params.envMap) {
+	// switch (params.envMap) {
 
-		case 'HDR JPG':
-			pmremRenderTarget = hdrJpgPMREMRenderTarget;
-			equirectangularMap = hdrJpgEquirectangularMap;
-			break;
-		case 'HDR':
-			pmremRenderTarget = hdrPMREMRenderTarget;
-			equirectangularMap = hdrEquirectangularMap;
-			break;
+	// 	case 'HDR JPG':
+	// 		pmremRenderTarget = hdrJpgPMREMRenderTarget;
+	// 		equirectangularMap = hdrJpgEquirectangularMap;
+	// 		break;
+	// 	case 'HDR':
+	pmremRenderTarget = hdrPMREMRenderTarget;
+	equirectangularMap = hdrEquirectangularMap;
+	// 		break;
 
-	}
+	// }
 
 	const newEnvMap = pmremRenderTarget ? pmremRenderTarget.texture : null;
 
@@ -245,6 +291,8 @@ function render() {
 	renderer.toneMappingExposure = params.exposure;
 
 	renderer.render(scene, camera);
+	label2DRenderer.render(scene, camera);
+
 
 }
 
